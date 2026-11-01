@@ -24,6 +24,7 @@ from PIL import Image, UnidentifiedImageError
 from app.config import config
 from app.models.schema import ImageMotion, MaterialInfo, VideoAspect, VideoConcatMode
 from app.services import (
+    google_media,
     codex_image,
     generation_progress,
     infistar_video,
@@ -1771,6 +1772,45 @@ def _save_openai_image_file(
     return image_path, width, height
 
 
+def generate_images_smart(
+    search_term: str,
+    minimum_duration: int,
+    video_aspect: VideoAspect = VideoAspect.portrait,
+    save_dir: str = "",
+    **kwargs,
+) -> List[MaterialInfo]:
+    """
+    Primary: Google Nano Banana 2.1 / Pro via Google GenAI (zero watermarks, ultra-crisp 9:16 3D cutaways).
+    Fallback: OpenAI compatible / Pollinations if Google AI Studio quota is exhausted on free tier.
+    """
+    if google_media.is_google_media_enabled():
+        try:
+            return google_media.generate_images_google(
+                search_term=search_term,
+                minimum_duration=minimum_duration,
+                video_aspect=video_aspect,
+                save_dir=save_dir,
+            )
+        except Exception as exc:
+            err = str(exc)
+            if "RESOURCE_EXHAUSTED" in err or "429" in err:
+                logger.warning(
+                    "Google Nano Banana API requires linking billing/developer credits in Google AI Studio "
+                    "(https://aistudio.google.com/apikey). Falling back to OpenAI/Pollinations..."
+                )
+            else:
+                logger.warning(
+                    f"Google Nano Banana generation failed ({exc}), falling back to OpenAI/Pollinations..."
+                )
+    return generate_images_openai(
+        search_term=search_term,
+        minimum_duration=minimum_duration,
+        video_aspect=video_aspect,
+        save_dir=save_dir,
+        **kwargs,
+    )
+
+
 def generate_images_openai(
     search_term: str,
     minimum_duration: int,
@@ -1899,9 +1939,9 @@ def _enhance_image_to_4k_clarity(image_path: str) -> None:
             if w < 512 or h < 512:
                 return
             rgb = img.convert("RGB")
-            # Crop out bottom watermark strip if from free Pollinations (e.g. 768x1344 or 768x1280)
+            # Crop out bottom watermark strip if from free Pollinations (e.g. 768x1344, 768x1280, or 1080x1920)
             if h >= 1200 and w <= 1080:
-                rgb = rgb.crop((0, 0, w, h - 48))
+                rgb = rgb.crop((0, 0, w, h - 75))
                 w, h = rgb.size
             # Upscale portrait 9:16 images to crisp 1080x1920 Full HD / 4K-mastered canvas
             if h > w and (w, h) != (1080, 1920):
@@ -1984,7 +2024,12 @@ def _download_videos_openai_image_on_demand(
         return video_paths
 
     if image_generator is None:
-        image_generator = generate_images_openai
+        if provider == "google_image" or (
+            provider == "openai_image" and google_media.is_google_media_enabled()
+        ):
+            image_generator = generate_images_smart
+        else:
+            image_generator = generate_images_openai
     generation_options = {}
     if provider == "codex_image":
         try:

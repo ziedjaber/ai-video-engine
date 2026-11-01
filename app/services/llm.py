@@ -1048,19 +1048,15 @@ def generate_terms(
     video_script = utils.remove_pause_tags(video_script or "").strip()
     if detailed_scene_prompts:
         goal = (
-            f"Break the video script into {amount} chronological 3D animation visual scene "
-            "descriptions in the style of the YouTube channel 'Zack D. Films' "
-            "that illustrate each step in the exact order of the narration."
+            f"Break the video script into {amount} chronological bright 3D educational cutaway scenes "
+            "in the style of the YouTube channel 'Zack D. Films' optimized for Google Nano Banana 2.1 & Veo 3.1."
         )
         ordering_rule = (
-            "6. keep the scene descriptions in the exact chronological order of the script "
-            "narration so each 3-second visual cut matches what the narrator is saying.\n"
-            "7. OVERRIDE constraint 2: each scene description MUST be 8-14 simple everyday "
-            "visual words (no commas inside a string) using Zack D. Films 3D shot types: "
-            "(a) '3D animated man in blue jeans in bright room ...' "
-            "(b) 'macro 3D close-up of human skin showing ... on bright sky blue background' "
-            "(c) '3D skin cross-section cutaway block with hair follicles and red tissue showing ... on bright sky blue background'.\n"
-            "8. ALWAYS use a bright sky blue background or bright room lighting (never dark or black backgrounds)."
+            "6. keep the scene descriptions in the exact chronological order of the script narration.\n"
+            "7. CRITICAL VISUAL RULE: NEVER use poetic metaphors (like 'electric rivers' or 'switches like hummingbird wings'). "
+            "Every single visual prompt MUST describe a BRIGHT, CLEAN 3D EDUCATIONAL CROSS-SECTION of a real everyday physical object sliced in half: "
+            "'Bright 3D educational cutaway animation in the style of Zack D Films, clean light-slate studio background, bright medical-grade studio lighting, 45-degree isometric cross-section view of [CONCRETE EVERYDAY OBJECT SLICED IN HALF], showing [EXACT INTERNAL MOVING PARTS] in glossy red, gold, and Matte plastic textures, ultra-sharp macro focus, Cinema4D and Octane Render, 9:16 vertical, no watermark, no text.'\n"
+            "8. ALWAYS use bright surgical studio lighting and clean grey/light-slate studio backgrounds (NEVER pitch dark or black abstract backgrounds)."
         )
         example_terms = [
             f"step {index} 3D cutaway scene on bright sky blue background"

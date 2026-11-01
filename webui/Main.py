@@ -7263,7 +7263,7 @@ def _render_background_music_settings(params, elevenlabs_api_key_rendered=False)
         default_value=_saved_ui_choice(
             "bgm_type",
             [value for _, value in bgm_options],
-            "random",
+            "none",
         ),
         key="bgm_type_select",
         format_func=lambda value: dict((v, label) for label, v in bgm_options)[value],
