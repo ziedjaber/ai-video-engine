@@ -1382,7 +1382,7 @@ def _is_full_cgi_prompt(search_term: str) -> bool:
     """A trend-blueprint cgi_3d_prompt is long and already names its render style."""
     term = str(search_term or "").lower()
     return len(term) > 90 and any(
-        marker in term for marker in ("zack d", "cutaway", "cross-section", "unreal engine", "3d ")
+        marker in term for marker in ("zack d", "cutaway", "cross-section", "unreal engine", "cinema4d", "octane", "photorealistic", "isometric", "3d ")
     )
 
 

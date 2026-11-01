@@ -1049,14 +1049,18 @@ def generate_terms(
     if detailed_scene_prompts:
         goal = (
             f"Break the video script into {amount} chronological bright 3D educational cutaway scenes "
-            "in the style of the YouTube channel 'Zack D. Films' optimized for Google Nano Banana 2.1 & Veo 3.1."
+            "following the ZACK D. ULTIMATE VIRAL 3D FORMULA (Cinema4D & Octane Render, 9:16 vertical)."
         )
         ordering_rule = (
             "6. keep the scene descriptions in the exact chronological order of the script narration.\n"
-            "7. CRITICAL VISUAL RULE: NEVER use poetic metaphors (like 'electric rivers' or 'switches like hummingbird wings'). "
-            "Every single visual prompt MUST describe a BRIGHT, CLEAN 3D EDUCATIONAL CROSS-SECTION of a real everyday physical object sliced in half: "
-            "'Bright 3D educational cutaway animation in the style of Zack D Films, clean light-slate studio background, bright medical-grade studio lighting, 45-degree isometric cross-section view of [CONCRETE EVERYDAY OBJECT SLICED IN HALF], showing [EXACT INTERNAL MOVING PARTS] in glossy red, gold, and Matte plastic textures, ultra-sharp macro focus, Cinema4D and Octane Render, 9:16 vertical, no watermark, no text.'\n"
-            "8. ALWAYS use bright surgical studio lighting and clean grey/light-slate studio backgrounds (NEVER pitch dark or black abstract backgrounds)."
+            "7. STRICT 3D VISUAL DIRECTIVE (ZACK D. ULTIMATE FORMULA):\n"
+            "   - NO ABSTRACT DARKNESS: Never use dark, moody, or pitch-black sci-fi backgrounds. Use clean, bright, modern light-slate or medical-grade white studio backdrops with soft ambient occlusion shadows.\n"
+            "   - ISOMETRIC CUTAWAY: Every scene must show a 45-degree isometric cross-section or 3D macro slice of a real everyday object or advanced technology.\n"
+            "   - HYPER-REALISTIC MATERIALS: Explicitly specify polished chrome, glossy translucent red/blue plastics, brushed gold circuitry, and glowing micro-LED nodes.\n"
+            "   - ACTION & DYNAMICS: Show internal components mid-action (glowing data streams, moving mechanical teeth, shifting gates, or liquid flowing through transparent conduits).\n"
+            "   - FORMAT: Ultra-sharp macro focus, Cinema4D and Octane Render look, 9:16 vertical smartphone format, zero text, zero watermarks, photorealistic.\n"
+            "8. EXACT PROMPT TEMPLATE TO GENERATE:\n"
+            "   'Bright 3D educational cutaway animation in the style of Zack D Films, clean light-slate studio background, bright medical-grade studio lighting, 45-degree isometric cross-section view of [EXACT OBJECT/TECHNOLOGY SLICED IN HALF], revealing hyper-detailed internal moving parts like [SPECIFIC INTERNAL MECHANISMS] in glossy red, gold, and brushed metal textures, ultra-sharp macro focus, Cinema4D and Octane Render, 9:16 vertical aspect ratio, no watermark, no text, photorealistic.'"
         )
         example_terms = [
             f"step {index} 3D cutaway scene on bright sky blue background"
