@@ -1377,6 +1377,14 @@ def _openai_image_size(video_aspect: VideoAspect) -> str:
     return OPENAI_IMAGE_DEFAULT_SIZES.get(VideoAspect(video_aspect), "1024x1024")
 
 
+def _is_full_cgi_prompt(search_term: str) -> bool:
+    """A trend-blueprint cgi_3d_prompt is long and already names its render style."""
+    term = str(search_term or "").lower()
+    return len(term) > 90 and any(
+        marker in term for marker in ("zack d", "cutaway", "cross-section", "unreal engine", "3d ")
+    )
+
+
 def _openai_image_prompt(search_term: str) -> str:
     """
     把脚本关键词包装成最终提示词。
@@ -1392,6 +1400,9 @@ def _openai_image_prompt(search_term: str) -> str:
     替换失败（如模板误写了格式化语法）也回退原文，不让配置错误中断
     整个生成任务。
     """
+    if _is_full_cgi_prompt(search_term):
+        # Blueprint cgi_3d_prompts already describe style, lighting and framing.
+        return search_term
     template = str(config.app.get("openai_image_prompt_template", "") or "").strip()
     if not template or "{term}" not in template:
         return search_term
@@ -1562,14 +1573,14 @@ def _fallback_pollinations_free_image(prompt: str, size: str = "1024x1536") -> t
     """Fallback to anonymous image.pollinations.ai GET endpoint when gen.pollinations.ai pollen balance is 0."""
     import re as _re
     from urllib.parse import quote as _quote
-    w, h = 768, 1344
+    w, h = 1080, 1920
     if "x" in str(size):
         try:
             pw, ph = [int(x) for x in str(size).lower().split("x", 1)]
             if pw > ph:
-                w, h = 1344, 768
+                w, h = 1920, 1080
             elif pw == ph:
-                w, h = 1024, 1024
+                w, h = 1080, 1080
         except Exception:
             pass
     seed = random.randint(1000, 999999)
@@ -1789,7 +1800,17 @@ def generate_images_openai(
         f"term={search_term!r}, size={image_size}"
     )
     generation_progress.submitting("openai_image")
-    image_bytes, failure_detail = _request_openai_image(endpoint, payload)
+    if "pollinations.ai" in endpoint.lower() and bool(
+        config.app.get("openai_image_free_pollinations_direct", True)
+    ):
+        # Free Flux (no key, no pollen balance) straight at 1080x1920.
+        image_bytes, failure_detail = _fallback_pollinations_free_image(
+            payload["prompt"], "1080x1920" if aspect == VideoAspect.portrait else image_size
+        )
+        if image_bytes is None:
+            image_bytes, failure_detail = _request_openai_image(endpoint, payload)
+    else:
+        image_bytes, failure_detail = _request_openai_image(endpoint, payload)
     if image_bytes is None:
         logger.error(
             f"openai image generation failed: term={search_term!r}, "
@@ -1883,7 +1904,7 @@ def _enhance_image_to_4k_clarity(image_path: str) -> None:
                 rgb = rgb.crop((0, 0, w, h - 48))
                 w, h = rgb.size
             # Upscale portrait 9:16 images to crisp 1080x1920 Full HD / 4K-mastered canvas
-            if h > w and w < 1080:
+            if h > w and (w, h) != (1080, 1920):
                 rgb = rgb.resize((1080, 1920), Image.Resampling.LANCZOS)
             elif w > h and h < 1080:
                 rgb = rgb.resize((1920, 1080), Image.Resampling.LANCZOS)
@@ -1998,6 +2019,11 @@ def _download_videos_openai_image_on_demand(
         style_idx = 0
         while len(effective_search_terms) < needed_clips:
             base_term = search_terms[len(effective_search_terms) % len(search_terms)]
+            if _is_full_cgi_prompt(base_term):
+                angles = ("extreme macro close-up angle", "slow orbiting side angle", "top-down exploded view")
+                effective_search_terms.append(f"{base_term}, {angles[style_idx % len(angles)]}")
+                style_idx += 1
+                continue
             style = shot_styles[style_idx % len(shot_styles)]
             effective_search_terms.append(f"{base_term}, {style}")
             style_idx += 1

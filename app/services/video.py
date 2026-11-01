@@ -1876,6 +1876,17 @@ def generate_video(
             return "#000000" if params.text_background_color else None
         return params.text_background_color
 
+    highlight_color = str(config.ui.get("subtitle_highlight_color", "") or "").strip()
+
+    def _phrase_color(text: str) -> str:
+        """Viral TikTok/Shorts style: phrases with a key word (long word or number) pop in the highlight colour."""
+        if not highlight_color:
+            return params.text_fore_color
+        words = re.findall(r"[\w'’-]+", text or "")
+        if any(len(w) >= 7 or any(ch.isdigit() for ch in w) for w in words):
+            return highlight_color
+        return params.text_fore_color
+
     def create_text_clip(subtitle_item):
         params.font_size = int(params.font_size)
         params.stroke_width = int(params.stroke_width)
@@ -1948,7 +1959,7 @@ def generate_video(
                 text=wrapped_txt,
                 font=font_path,
                 font_size=params.font_size,
-                color=params.text_fore_color,
+                color=_phrase_color(phrase),
                 bg_color=None,
                 stroke_color=params.stroke_color,
                 stroke_width=params.stroke_width,
@@ -1979,7 +1990,7 @@ def generate_video(
                 text=wrapped_txt,
                 font=font_path,
                 font_size=params.font_size,
-                color=params.text_fore_color,
+                color=_phrase_color(phrase),
                 bg_color=None,
                 stroke_color=params.stroke_color,
                 stroke_width=params.stroke_width,
@@ -2010,7 +2021,7 @@ def generate_video(
                 text=wrapped_txt,
                 font=font_path,
                 font_size=params.font_size,
-                color=params.text_fore_color,
+                color=_phrase_color(phrase),
                 bg_color=None,
                 stroke_color=params.stroke_color,
                 stroke_width=params.stroke_width,

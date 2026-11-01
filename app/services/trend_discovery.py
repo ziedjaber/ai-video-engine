@@ -87,6 +87,59 @@ Return ONLY a valid JSON object with keys `"topic"`, `"source_trend"`, `"script"
 """.strip()
 
 
+VIRAL_ZACK_D_PROMPT = """
+### ROLE
+You are the lead scriptwriter and 3D visual director for a viral short-form channel like "Zack D. Films" and "Veritasium".
+Your specialty is taking complex Science, Technology, and Physics trends and explaining them to a 12-year-old using visceral, physical analogies, high-retention hooks, and strict Halal compliance.
+
+### INPUT TREND DATA
+{trending_topics}
+
+### STRICT HALAL GUARDRAILS (MANDATORY)
+- ZERO music references, gambling, alcohol, dating, astrology, or inappropriate anatomy.
+- Visuals must strictly focus on mechanical objects, electronics, physics simulations, nature, space, or microscopic/anatomical cross-sections without nudity or full human bodies.
+
+### VIRAL SCRIPT FORMULA (30-40 SECONDS, ~85-100 WORDS)
+1. THE 3-SECOND HOOK (Sentence 1): NEVER start with "When you..." or "Today we will see...". Start with a shocking physical reality, a counter-intuitive fact, or "If you sliced open a [object]...".
+2. PHYSICAL ANALOGIES (Body): Never use dry textbook words like "bias" or "vectors" without comparing them to something physical (e.g., "billions of microscopic switches", "a maze of glowing glass tunnels"). Every sentence must trigger a clear visual image in the viewer's brain.
+3. PACING: Short, punchy sentences (max 12 words per sentence). Zero fluff.
+4. LOOPING ENDING (Final sentence): End with a mind-blowing conclusion that seamlessly loops back to the first sentence.
+
+### VISUAL STRATEGY (CRITICAL TO AVOID BORING ABSTRACT BACKGROUNDS)
+You must provide TWO types of visual queries for every scene:
+1. `cgi_3d_prompt`: For AI Image/Video Generators (Flux / Midjourney / Kling). Must specify: "3D cutaway cross-section animation in the style of Zack D Films, glossy plastic and metal textures, studio rim lighting, dark background, macro close-up of [exact physical mechanism], Unreal Engine 5 render, 9:16 vertical".
+2. `stock_search_keyword`: For Pexels/Pixabay fallback. NEVER use abstract words like "math nodes", "vector flow", or "error graph" (these return ugly psychedelic screensavers). ONLY use 2-3 words describing REAL, TANGIBLE PHYSICAL OBJECTS filmed in close-up (e.g., "silicon wafer macro", "fiber optic cables", "circuit board soldering", "data center server", "electric spark slow motion").
+Provide 8 to 10 `cgi_3d_prompts` (one per scene, in the chronological order of the narration) and 8 `video_keywords`.
+
+### OUTPUT FORMAT (STRICT JSON ONLY)
+Return ONLY valid JSON with no markdown formatting:
+{
+  "selected_topic": "Viral clickable title (e.g., What Actually Happens Inside AI Chips?)",
+  "viral_hook_type": "Curiosity Gap / Cutaway Mechanism",
+  "source_trend": "The raw trend line you picked from the input",
+  "script": "The complete spoken narration text (85-100 words, fast-paced, Zack D. Films style).",
+  "cgi_3d_prompts": [
+    "3D cutaway cross-section in the style of Zack D Films, macro view inside a glowing silicon microchip, millions of tiny golden logic gates flipping on and off, dark background, Unreal Engine 5, 9:16"
+  ],
+  "video_keywords": [
+    "microchip macro",
+    "fiber optic light",
+    "circuit board closeup",
+    "server room cables",
+    "laser beam glass",
+    "computer processor",
+    "robotic arm factory",
+    "electric arc macro"
+  ],
+  "sfx_cues": [
+    "crisp mechanical click",
+    "high-tech electrical hum",
+    "deep sub-bass impact"
+  ]
+}
+""".strip()
+
+
 def fetch_google_autocomplete_trends(
     prefixes: tuple[str, ...] | list[str] = DEFAULT_GOOGLE_PREFIXES,
     limit_per_prefix: int = 3,
@@ -369,15 +422,15 @@ def generate_viral_video_blueprint(
         )
     )
     trending_array_str = format_trending_topics_array(raw_trends)
-    language_instruction = (
-        f"Write the `topic` and `script` in language '{language}', while keeping `scene_prompts` in English."
-        if (language or "").strip()
-        else "Write everything in English."
+    language_note = (
+        f"\n### LANGUAGE\nWrite `selected_topic` and `script` in language '{language}'. "
+        "Keep `cgi_3d_prompts` and `video_keywords` in English.\n"
+        if (language or "").strip() and not str(language).lower().startswith("en")
+        else ""
     )
 
-    prompt = VIRAL_VIDEO_BLUEPRINT_PROMPT_TEMPLATE.replace(
-        "{{TRENDING_TOPICS_ARRAY}}", trending_array_str
-    ).replace("{language_instruction}", language_instruction)
+    # str.replace (not .format) because the prompt contains literal JSON braces.
+    prompt = VIRAL_ZACK_D_PROMPT.replace("{trending_topics}", trending_array_str) + language_note
 
     try:
         response = (
@@ -391,24 +444,30 @@ def generate_viral_video_blueprint(
                 parsed = json.loads(cleaned)
             except Exception:
                 parsed = llm._extract_embedded_json(cleaned, "{")
-            if isinstance(parsed, dict) and parsed.get("topic") and parsed.get("script"):
-                scene_prompts = [
-                    re.sub(r"\s+", " ", str(s).replace(",", " ")).strip()
-                    for s in (parsed.get("scene_prompts") or [])
-                    if str(s).strip()
-                ]
-                sfx_cues = [
-                    str(s).strip()
-                    for s in (parsed.get("sfx_cues") or [])
-                    if str(s).strip()
-                ]
+            topic = (
+                (parsed.get("selected_topic") or parsed.get("topic"))
+                if isinstance(parsed, dict)
+                else ""
+            )
+            if isinstance(parsed, dict) and topic and parsed.get("script"):
+                def _clean_list(key: str) -> list[str]:
+                    return [
+                        re.sub(r"\s+", " ", str(s)).strip()
+                        for s in (parsed.get(key) or [])
+                        if str(s).strip()
+                    ]
+
+                cgi_prompts = _clean_list("cgi_3d_prompts") or _clean_list("scene_prompts")
                 return {
                     "success": True,
-                    "topic": str(parsed.get("topic", "")).strip(),
+                    "topic": str(topic).strip(),
+                    "viral_hook_type": str(parsed.get("viral_hook_type", "")).strip(),
                     "source_trend": str(parsed.get("source_trend", "")).strip(),
                     "script": str(parsed.get("script", "")).strip(),
-                    "scene_prompts": scene_prompts,
-                    "sfx_cues": sfx_cues,
+                    "scene_prompts": cgi_prompts,
+                    "cgi_3d_prompts": cgi_prompts,
+                    "video_keywords": _clean_list("video_keywords"),
+                    "sfx_cues": _clean_list("sfx_cues"),
                     "raw_trends": raw_trends,
                 }
     except Exception as exc:

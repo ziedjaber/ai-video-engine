@@ -24,6 +24,10 @@ listen_port = 8080
 log_requests = false
 
 [app]
+# Free Flux 3D renders via image.pollinations.ai (no API key, 1080x1920) when
+# openai_image_base_url points to pollinations.ai
+# openai_image_free_pollinations_direct = true
+
 # OpenAI - Codex: existing device-code provider; upgrades preserve this connection.
 # Uses ChatGPT subscription limits; no API key. Credentials live in storage/auth.
 openai_codex_model_name = ""

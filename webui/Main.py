@@ -202,14 +202,14 @@ LOOMLOOM_VIDEO_MODEL_PRICES = (
 DEFAULT_SUBTITLE_SETTINGS = {
     "subtitle_enabled": True,
     "font_name": "MicrosoftYaHeiBold.ttc",
-    "subtitle_position": "bottom",
-    "subtitle_display_mode": "sentence",
+    "subtitle_position": "custom",
+    "subtitle_display_mode": "word_by_word",
     "subtitle_animation": "none",
     "custom_position": 70.0,
     "text_fore_color": "#FFFFFF",
-    "font_size": 60,
+    "font_size": 88,
     "stroke_color": "#000000",
-    "stroke_width": 1.5,
+    "stroke_width": 5.0,
     "subtitle_background_enabled": False,
     "subtitle_background_color": "#000000",
     "rounded_subtitle_background": False,
@@ -5484,8 +5484,11 @@ def _render_script_settings(panel, params):
                                 if isinstance(blueprint, dict) and blueprint.get("success"):
                                     st.session_state["pending_ai_topic"] = blueprint["topic"]
                                     st.session_state["pending_ai_script"] = blueprint["script"]
-                                    if blueprint.get("scene_prompts"):
+                                    _src = str(config.app.get("video_source", "") or "")
+                                    if _src in ("openai_image", "codex_image") and blueprint.get("scene_prompts"):
                                         st.session_state["pending_ai_terms"] = "\n".join(blueprint["scene_prompts"])
+                                    elif blueprint.get("video_keywords"):
+                                        st.session_state["pending_ai_terms"] = ", ".join(blueprint["video_keywords"])
                                     st.session_state["viral_blueprint_sfx"] = blueprint.get("sfx_cues", [])
                                     st.session_state["viral_blueprint_source"] = blueprint.get("source_trend", "")
                                     st.session_state["live_raw_trends"] = blueprint.get("raw_trends", [])
