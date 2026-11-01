@@ -1,0 +1,812 @@
+/* ==========================================================================
+   MoneyPrinterTurbo — Modern Studio UI Design System
+   ========================================================================== */
+
+:root {
+    --mpt-primary: #4f46e5;
+    --mpt-primary-hover: #4338ca;
+    --mpt-accent: #7c3aed;
+    --mpt-bg: #f8fafc;
+    --mpt-surface: #ffffff;
+    --mpt-surface-subtle: #f1f5f9;
+    --mpt-surface-hover: #f8fafc;
+    --mpt-text: #0f172a;
+    --mpt-text-secondary: #475569;
+    --mpt-text-muted: #64748b;
+    --mpt-border: #e2e8f0;
+    --mpt-border-strong: #cbd5e1;
+    --mpt-ring: rgba(79, 70, 229, 0.18);
+    --mpt-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 1px 2px -1px rgba(15, 23, 42, 0.03);
+    --mpt-shadow-card: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
+    --mpt-shadow-card-hover: 0 10px 28px -4px rgba(79, 70, 229, 0.09), 0 4px 10px -2px rgba(15, 23, 42, 0.04);
+    --mpt-shadow-cta: 0 10px 25px -5px rgba(79, 70, 229, 0.42), 0 4px 10px -2px rgba(124, 58, 237, 0.22);
+    --mpt-radius-sm: 8px;
+    --mpt-radius-md: 10px;
+    --mpt-radius-lg: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --mpt-primary: #6366f1;
+        --mpt-primary-hover: #818cf8;
+        --mpt-accent: #a855f7;
+        --mpt-bg: #0b0f19;
+        --mpt-surface: #111827;
+        --mpt-surface-subtle: #1e293b;
+        --mpt-surface-hover: #1f2937;
+        --mpt-text: #f8fafc;
+        --mpt-text-secondary: #cbd5e1;
+        --mpt-text-muted: #94a3b8;
+        --mpt-border: rgba(148, 163, 184, 0.16);
+        --mpt-border-strong: rgba(148, 163, 184, 0.28);
+        --mpt-ring: rgba(99, 102, 241, 0.28);
+        --mpt-shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+        --mpt-shadow-card: 0 8px 24px -4px rgba(0, 0, 0, 0.4);
+        --mpt-shadow-card-hover: 0 12px 32px -4px rgba(99, 102, 241, 0.18);
+        --mpt-shadow-cta: 0 10px 28px -5px rgba(99, 102, 241, 0.45);
+    }
+}
+
+header[data-testid="stHeader"],
+div[data-testid="stToolbar"],
+div[data-testid="stDecoration"],
+div[data-testid="stStatusWidget"],
+div[data-testid="stSkillsNudgeAnchor"],
+div[data-testid="stSkillsNudge"] {
+    display: none !important;
+}
+
+div[data-testid="stMainBlockContainer"] {
+    padding-top: 1rem !important;
+    padding-bottom: 3rem !important;
+    max-width: 1720px !important;
+}
+
+h1 {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* ==========================================================================
+   Top Navigation Bar & Brand Header
+   ========================================================================== */
+
+div[class*="st-key-top_bar"] {
+    background: var(--mpt-surface);
+    border: 1px solid var(--mpt-border);
+    border-radius: var(--mpt-radius-lg);
+    padding: 0.75rem 1.25rem !important;
+    margin-bottom: 1.25rem !important;
+    box-shadow: var(--mpt-shadow-sm);
+}
+
+/* Streamlit 默认让标签中的帮助区域占据剩余宽度，导致问号按钮贴到控件最右侧。
+   帮助提示在语义上从属于标签文字，因此取消该区域的伸展，并用固定小间距让
+   问号紧跟标签；没有 help 参数的标签不存在这个 div，不会受到影响。 */
+label[data-testid="stWidgetLabel"] > div {
+    flex: 0 0 auto !important;
+    width: auto !important;
+    margin-left: 0.35rem !important;
+}
+
+label[data-testid="stWidgetLabel"] p {
+    font-weight: 500 !important;
+    font-size: 0.85rem !important;
+    color: var(--mpt-text-secondary) !important;
+}
+
+/* 视频主题与大模型存在直接依赖，把配置入口放在字段标签旁。这里将 tertiary
+   button 收敛为普通文字链接，避免它与下方“生成文案”主操作争夺视觉层级；
+   text_area 仍保留折叠 label，因此屏幕阅读器可以继续读取字段名称。 */
+div[class*="st-key-video_subject_label_row"] {
+    align-items: baseline !important;
+    justify-content: space-between !important;
+    gap: 0.45rem !important;
+}
+
+/* 自定义标签行和 text_area 是同一字段的两个子元素。覆盖 Streamlit 容器默认
+   的纵向大间距，使它与原生“标签 + 输入框”控件保持相同的视觉节奏。 */
+div[class*="st-key-video_subject_field"] {
+    gap: 0.35rem !important;
+}
+
+div[class*="st-key-video_subject_label_row"]
+    [data-testid="stMarkdownContainer"] p {
+    margin: 0 !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    color: var(--mpt-text-secondary) !important;
+    line-height: 1.25rem !important;
+}
+
+div[class*="st-key-video_subject_label_row"] button {
+    min-height: 0 !important;
+    height: auto !important;
+    padding: 0.1rem 0.45rem !important;
+    border: 1px solid rgba(79, 70, 229, 0.2) !important;
+    border-radius: 9999px !important;
+    background: rgba(79, 70, 229, 0.06) !important;
+    color: var(--mpt-primary) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    line-height: 1.25rem !important;
+    transition: all 0.15s ease !important;
+}
+
+div[class*="st-key-video_subject_label_row"] button p {
+    margin: 0 !important;
+    color: var(--mpt-primary) !important;
+    font-size: 0.75rem !important;
+    font-weight: 600 !important;
+    line-height: 1.25rem !important;
+}
+
+div[class*="st-key-video_subject_label_row"] button:hover {
+    background: rgba(79, 70, 229, 0.12) !important;
+    border-color: rgba(79, 70, 229, 0.35) !important;
+    text-decoration: none !important;
+}
+
+/* 配音方式位于四列布局中的窄面板。Streamlit 的 stretch 模式默认让单个分段
+   按钮接近半行宽，三个选项会换成两行；这里仅对该控件改为三等分，并压缩
+   水平内边距，保持其它 segmented control 的原生尺寸不变。 */
+div[class*="st-key-voice_mode_control"] [role="radiogroup"] {
+    flex-wrap: nowrap !important;
+    background: var(--mpt-surface-subtle) !important;
+    padding: 0.2rem !important;
+    border-radius: var(--mpt-radius-md) !important;
+    gap: 0.2rem !important;
+}
+
+div[class*="st-key-voice_mode_control"] [role="radiogroup"] > button {
+    flex: 1 1 0 !important;
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 0.3rem 0.4rem !important;
+    border-radius: var(--mpt-radius-sm) !important;
+    border: 0 !important;
+}
+
+div[class*="st-key-voice_mode_control"] [role="radiogroup"] > button p {
+    overflow: hidden !important;
+    font-size: 0.8rem !important;
+    font-weight: 500 !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+
+/* 顶部品牌区将项目名和弱化版本号放在同一基线。项目名称仍是页面唯一的 h1；
+   版本号本身作为项目链接，避免增加独立图标而干扰标题的视觉层级。 */
+.mpt-brand {
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    color: inherit;
+    line-height: 1.2;
+}
+
+/* Streamlit 会在自定义 h1 内增加一层文本容器，实际的行内布局需要作用在
+   这层容器上，才能稳定控制项目名和版本号的间距。 */
+.mpt-brand > span:first-child {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-width: 0;
+}
+
+.mpt-brand__name {
+    min-width: 0;
+    font-size: 1.75rem;
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    white-space: nowrap;
+    background: linear-gradient(135deg, var(--mpt-primary) 0%, var(--mpt-accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.mpt-brand__version {
+    flex: 0 0 auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--mpt-primary) !important;
+    background: rgba(79, 70, 229, 0.08);
+    border: 1px solid rgba(79, 70, 229, 0.2);
+    border-radius: 9999px;
+    padding: 0.15rem 0.55rem;
+    text-decoration: none !important;
+    white-space: nowrap;
+    transition: all 0.15s ease;
+}
+
+.mpt-brand__version:hover {
+    color: var(--mpt-primary-hover) !important;
+    background: rgba(79, 70, 229, 0.14);
+    border-color: rgba(79, 70, 229, 0.35);
+    text-decoration: none !important;
+}
+
+.mpt-brand__version:focus-visible {
+    outline: 2px solid var(--mpt-primary);
+    outline-offset: 2px;
+}
+
+/* 新版本提醒只在确有正式版本更新时出现。使用文字链接而不是按钮或横幅，
+   让它保持可发现性，同时不抢占项目标题和主要操作入口的视觉层级。 */
+.mpt-brand__update {
+    flex: 0 0 auto;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #e11d48 !important;
+    background: rgba(225, 29, 72, 0.08);
+    border: 1px solid rgba(225, 29, 72, 0.2);
+    border-radius: 9999px;
+    padding: 0.15rem 0.6rem;
+    text-decoration: none !important;
+    white-space: nowrap;
+}
+
+.mpt-brand__update:hover {
+    background: rgba(225, 29, 72, 0.14);
+    text-decoration: none !important;
+}
+
+.mpt-brand__update:focus-visible {
+    outline: 2px solid rgba(225, 29, 72, 0.48);
+    outline-offset: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+    .mpt-brand__update {
+        color: #fb7185 !important;
+        background: rgba(251, 113, 133, 0.12);
+        border-color: rgba(251, 113, 133, 0.25);
+    }
+}
+
+/* Streamlit 会自动给 h1 追加一个标题锚点。品牌区已有版本号项目链接，额外的
+   标题锚点没有实际价值，因此只在这个标题内隐藏，避免窄屏出现多余图标。 */
+.mpt-brand > [data-testid="stHeaderActionElements"] {
+    display: none !important;
+}
+
+/* 顶部任务入口由 st.fragment 定时刷新，Streamlit 会为 Fragment 自动生成一个
+   占满整行的 LayoutWrapper。这里只收缩该包装层，保证右侧操作区按内容紧凑排列。 */
+.st-key-top_bar_actions
+    > div[data-testid="stLayoutWrapper"]:first-child {
+    flex: 0 0 auto !important;
+    width: fit-content !important;
+}
+
+/* ==========================================================================
+   4-Step Workflow Studio Cards (Main Settings Grid)
+   ========================================================================== */
+
+div[class*="st-key-main_settings_grid"]
+    > div[data-testid="stLayoutWrapper"]
+    > div[data-testid="stHorizontalBlock"] {
+    gap: 1.15rem !important;
+    align-items: stretch !important;
+}
+
+div[class*="st-key-main_settings_grid"]
+    div[data-testid="stVerticalBlockBorderWrapper"] {
+    background: var(--mpt-surface) !important;
+    border: 1px solid var(--mpt-border) !important;
+    border-radius: var(--mpt-radius-lg) !important;
+    padding: 1.25rem 1.2rem !important;
+    box-shadow: var(--mpt-shadow-card) !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+div[class*="st-key-main_settings_grid"]
+    div[data-testid="stVerticalBlockBorderWrapper"]:hover,
+div[class*="st-key-main_settings_grid"]
+    div[data-testid="stVerticalBlockBorderWrapper"]:focus-within {
+    border-color: rgba(79, 70, 229, 0.35) !important;
+    box-shadow: var(--mpt-shadow-card-hover) !important;
+}
+
+/* Section Card Headers with automatic 01-04 step badges */
+div[class*="st-key-main_settings_grid"]
+    div[data-testid="stVerticalBlockBorderWrapper"]
+    > div
+    > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:first-child
+    [data-testid="stMarkdownContainer"]
+    p {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.55rem !important;
+    font-size: 1.02rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.01em !important;
+    color: var(--mpt-text) !important;
+    padding-bottom: 0.75rem !important;
+    margin-bottom: 0.25rem !important;
+    border-bottom: 1px solid var(--mpt-border) !important;
+}
+
+div[class*="st-key-main_settings_grid"]
+    div[data-testid="stColumn"]
+    div[data-testid="stVerticalBlockBorderWrapper"]
+    > div
+    > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:first-child
+    [data-testid="stMarkdownContainer"]
+    p::before {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.55rem;
+    height: 1.55rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.12) 0%, rgba(124, 58, 237, 0.12) 100%);
+    border: 1px solid rgba(79, 70, 229, 0.22);
+    color: var(--mpt-primary);
+    font-size: 0.72rem;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+
+div[class*="st-key-main_settings_grid"]
+    div[data-testid="stColumn"]:nth-child(1)
+    div[data-testid="stVerticalBlockBorderWrapper"]
+    > div
+    > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:first-child
+    [data-testid="stMarkdownContainer"]
+    p::before {
+    content: "01";
+}
+
+div[class*="st-key-main_settings_grid"]
+    div[data-testid="stColumn"]:nth-child(2)
+    div[data-testid="stVerticalBlockBorderWrapper"]
+    > div
+    > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:first-child
+    [data-testid="stMarkdownContainer"]
+    p::before {
+    content: "02";
+}
+
+div[class*="st-key-main_settings_grid"]
+    div[data-testid="stColumn"]:nth-child(3)
+    div[data-testid="stVerticalBlockBorderWrapper"]
+    > div
+    > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:first-child
+    [data-testid="stMarkdownContainer"]
+    p::before {
+    content: "03";
+}
+
+div[class*="st-key-main_settings_grid"]
+    div[data-testid="stColumn"]:nth-child(4)
+    div[data-testid="stVerticalBlockBorderWrapper"]
+    > div
+    > div[data-testid="stVerticalBlock"]
+    > div[data-testid="stElementContainer"]:first-child
+    [data-testid="stMarkdownContainer"]
+    p::before {
+    content: "04";
+}
+
+/* ==========================================================================
+   Form Inputs, Selectboxes, Buttons & Primary CTA
+   ========================================================================== */
+
+div[data-baseweb="input"],
+div[data-baseweb="textarea"],
+div[data-baseweb="select"] > div {
+    border-radius: var(--mpt-radius-md) !important;
+    border-color: var(--mpt-border-strong) !important;
+    background-color: var(--mpt-surface) !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+div[data-baseweb="input"]:hover,
+div[data-baseweb="textarea"]:hover,
+div[data-baseweb="select"] > div:hover {
+    border-color: var(--mpt-primary) !important;
+}
+
+div[data-baseweb="input"]:focus-within,
+div[data-baseweb="textarea"]:focus-within,
+div[data-baseweb="select"] > div:focus-within {
+    border-color: var(--mpt-primary) !important;
+    box-shadow: 0 0 0 3px var(--mpt-ring) !important;
+}
+
+/* Secondary buttons */
+button[kind="secondary"] {
+    border-radius: var(--mpt-radius-md) !important;
+    border: 1px solid var(--mpt-border-strong) !important;
+    font-weight: 500 !important;
+    transition: all 0.15s ease !important;
+}
+
+button[kind="secondary"]:hover:not(:disabled) {
+    border-color: var(--mpt-primary) !important;
+    color: var(--mpt-primary) !important;
+    background: rgba(79, 70, 229, 0.04) !important;
+}
+
+/* AI Action Buttons (Generate Script & Keywords) */
+div[class*="st-key-auto_generate_script"] button,
+div[class*="st-key-auto_generate_terms"] button {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.07) 0%, rgba(124, 58, 237, 0.07) 100%) !important;
+    border: 1px solid rgba(79, 70, 229, 0.26) !important;
+    color: var(--mpt-primary) !important;
+    font-weight: 600 !important;
+}
+
+div[class*="st-key-auto_generate_script"] button:hover:not(:disabled),
+div[class*="st-key-auto_generate_terms"] button:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(79, 70, 229, 0.13) 0%, rgba(124, 58, 237, 0.13) 100%) !important;
+    border-color: var(--mpt-primary) !important;
+    transform: translateY(-1px);
+}
+
+/* Hero Primary CTA Button: Generate Video */
+div[class*="st-key-generate_video_button"] {
+    margin-top: 0.5rem !important;
+}
+
+div[class*="st-key-generate_video_button"] button[kind="primary"] {
+    min-height: 3.35rem !important;
+    border-radius: 12px !important;
+    border: 0 !important;
+    background: linear-gradient(135deg, var(--mpt-primary) 0%, #6366f1 50%, var(--mpt-accent) 100%) !important;
+    color: #ffffff !important;
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.01em !important;
+    box-shadow: var(--mpt-shadow-cta) !important;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease !important;
+}
+
+div[class*="st-key-generate_video_button"] button[kind="primary"] p {
+    font-size: 1.05rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+}
+
+div[class*="st-key-generate_video_button"] button[kind="primary"]:hover:not(:disabled) {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+}
+
+div[class*="st-key-generate_video_button"] button[kind="primary"]:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+/* File Uploader Dropzone */
+section[data-testid="stFileUploaderDropzone"] {
+    border-radius: var(--mpt-radius-md) !important;
+    border: 1.5px dashed var(--mpt-border-strong) !important;
+    background: var(--mpt-surface-subtle) !important;
+    transition: border-color 0.15s ease, background-color 0.15s ease !important;
+}
+
+section[data-testid="stFileUploaderDropzone"]:hover {
+    border-color: var(--mpt-primary) !important;
+}
+
+/* Alerts (Info / Warning / Success / Error) */
+div[data-testid="stAlert"] {
+    border-radius: var(--mpt-radius-md) !important;
+}
+
+@media (max-width: 700px) {
+    .mpt-brand > span:first-child {
+        gap: 0.45rem;
+    }
+
+    .mpt-brand__name {
+        font-size: 1.5rem;
+    }
+
+    .mpt-brand__version {
+        font-size: 0.72rem;
+    }
+
+    .mpt-brand__update {
+        font-size: 0.7rem;
+    }
+
+}
+
+@media (max-width: 480px) {
+    .mpt-brand > span:first-child {
+        gap: 0.35rem;
+    }
+
+    .mpt-brand__name {
+        font-size: 1.35rem;
+    }
+
+    .mpt-brand__version {
+        font-size: 0.68rem;
+    }
+
+    .mpt-brand__update {
+        font-size: 0.65rem;
+    }
+
+}
+
+/* 高级设置属于内容展开入口，不是执行操作。保留 Streamlit 原生 expander 的
+   语义和键盘交互，只在带 advanced_settings_ key 的局部容器内移除卡片边框，
+   避免与紧邻的 AI 生成按钮形成两个连续大按钮的视觉干扰。 */
+div[class*="st-key-advanced_settings_"] details {
+    border: 1px solid var(--mpt-border) !important;
+    border-radius: var(--mpt-radius-md) !important;
+    background: var(--mpt-surface-subtle) !important;
+    transition: border-color 0.15s ease !important;
+}
+
+div[class*="st-key-advanced_settings_"] details:hover {
+    border-color: var(--mpt-border-strong) !important;
+}
+
+div[class*="st-key-advanced_settings_"] details > summary {
+    min-height: 2.35rem !important;
+    padding: 0.4rem 0.75rem !important;
+    color: var(--mpt-text-secondary) !important;
+    border-radius: var(--mpt-radius-md) !important;
+    opacity: 0.92;
+}
+
+div[class*="st-key-advanced_settings_"] details > summary:hover {
+    opacity: 1;
+    color: var(--mpt-primary) !important;
+    background: color-mix(
+        in srgb,
+        var(--mpt-primary) 5%,
+        transparent
+    ) !important;
+}
+
+/* 展开后让标题和内容共享同一背景，视觉上形成连续区域；折叠状态仍保持原有的
+   透明轻量入口，不额外占用页面层级。 */
+div[class*="st-key-advanced_settings_"] details[open] > summary {
+    border-radius: var(--mpt-radius-md) var(--mpt-radius-md) 0 0 !important;
+    border-bottom: 1px solid var(--mpt-border) !important;
+    opacity: 1;
+    color: var(--mpt-text) !important;
+    background: color-mix(
+        in srgb,
+        currentColor 4%,
+        transparent
+    ) !important;
+}
+
+div[class*="st-key-advanced_settings_"] details > summary:focus {
+    background: color-mix(
+        in srgb,
+        currentColor 4%,
+        transparent
+    ) !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+
+/* 键盘操作使用标题下划线作为焦点反馈，不再绘制任何外框，确保展开区域在视觉
+   上完全无边框，同时仍能让键盘用户识别当前焦点。 */
+div[class*="st-key-advanced_settings_"] details > summary:focus-visible {
+    box-shadow: none !important;
+}
+
+div[class*="st-key-advanced_settings_"] details > summary:focus-visible p {
+    text-decoration: underline !important;
+    text-underline-offset: 0.18em;
+}
+
+div[class*="st-key-advanced_settings_"] details > summary p {
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+}
+
+/* 内容区与展开标题无缝衔接，不使用任何边框，仅通过统一背景和内边距表达
+   控件从属于高级设置，避免出现嵌套卡片或割裂的两段式结构。 */
+div[class*="st-key-advanced_settings_"] div[data-testid="stExpanderDetails"] {
+    margin-top: 0 !important;
+    padding: 0.85rem 0.85rem 0.9rem 0.85rem !important;
+    border: 0 !important;
+    border-radius: 0 0 var(--mpt-radius-md) var(--mpt-radius-md) !important;
+    background: var(--mpt-surface) !important;
+}
+
+/* 任务管理 popover 需要固定宽度，避免内容从空状态、列表状态切换时
+   反复改变宽度造成页面抖动。宽度仍保留视口约束，兼容窄屏。 */
+div[data-testid="stPopoverBody"] {
+    width: min(860px, calc(100vw - 48px)) !important;
+    max-width: min(860px, calc(100vw - 48px)) !important;
+    border-radius: var(--mpt-radius-lg) !important;
+}
+
+div[data-testid="stPopoverBody"] div[data-testid="stVerticalBlock"] {
+    width: 100% !important;
+}
+
+/* 任务管理列表保留 Streamlit 原生布局，只做轻量压缩，避免每一行过高。
+   通过 task_row_ key 限定作用范围，避免影响其它配置面板的 container。 */
+div[class*="st-key-task_row_"] {
+    margin-bottom: 0.25rem !important;
+}
+
+div[class*="st-key-task_row_"] div[data-testid="stVerticalBlockBorderWrapper"] {
+    padding: 0.3rem 0.7rem !important;
+    border-radius: var(--mpt-radius-md) !important;
+}
+
+div[class*="st-key-task_row_"] div[data-testid="stElementContainer"],
+div[class*="st-key-task_row_"] div[data-testid="stMarkdown"] {
+    margin-bottom: 0 !important;
+}
+
+div[class*="st-key-task_row_"] div[data-testid="stMarkdown"] {
+    display: flex !important;
+    align-items: center !important;
+    min-height: 1.75rem !important;
+}
+
+div[class*="st-key-task_row_"] div[data-testid="stMarkdownContainer"] {
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 0 !important;
+}
+
+div[class*="st-key-task_row_"] p {
+    margin-bottom: 0 !important;
+    line-height: 1.25 !important;
+}
+
+div[class*="st-key-task_row_"] button[kind="secondary"] {
+    position: relative !important;
+    min-height: 1.75rem !important;
+    height: 1.75rem !important;
+    padding: 0.1rem 0.3rem !important;
+}
+
+/* 按钮文字视觉隐藏后，Streamlit 仍会保留图标与文字之间的默认间距，导致
+   单独图标向左偏移。清除该间距并让内容层占满按钮，确保操作图标严格居中。 */
+div[class*="st-key-task_row_"]
+    button[kind="secondary"]
+    span[data-has-shortcut] {
+    width: 100% !important;
+    gap: 0 !important;
+    justify-content: center !important;
+}
+
+/* 行内操作保留可访问的按钮名称，但视觉上只显示图标。使用屏幕阅读器可见的
+   隐藏方式，而不是 display:none，确保每个操作仍能被正确朗读。 */
+div[class*="st-key-task_row_"] button[kind="secondary"] p {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    clip-path: inset(50%) !important;
+    white-space: nowrap !important;
+}
+
+
+/* 中等宽度下将四个设置面板调整为 2×2。主内容区还会扣除页面边距，因此
+   1200～1440px 的常见视口不足以稳定容纳四列英文标签；断点覆盖到 1500px，
+   避免下拉内容和标题被裁切，真正的宽屏才恢复四列。 */
+@media (min-width: 701px) and (max-width: 1500px) {
+    .mpt-brand__name {
+        font-size: 1.6rem;
+    }
+
+    .mpt-brand__version {
+        font-size: 0.75rem;
+    }
+
+    div[class*="st-key-main_settings_grid"]
+        > div[data-testid="stLayoutWrapper"]
+        > div[data-testid="stHorizontalBlock"] {
+        flex-wrap: wrap !important;
+        gap: 1rem !important;
+    }
+
+    div[class*="st-key-main_settings_grid"]
+        > div[data-testid="stLayoutWrapper"]
+        > div[data-testid="stHorizontalBlock"]
+        > div[data-testid="stColumn"] {
+        flex: 1 1 calc(50% - 0.5rem) !important;
+        width: calc(50% - 0.5rem) !important;
+        min-width: calc(50% - 0.5rem) !important;
+    }
+}
+
+/* 移动端隐藏桌面表头，并将任务行重排为“主题 + 元信息 + 操作”紧凑结构。 */
+@media (max-width: 700px) {
+    div[class*="st-key-task_table_header_"] {
+        display: none !important;
+    }
+
+    div[class*="st-key-task_row_"]
+        > div[data-testid="stLayoutWrapper"]
+        > div[data-testid="stHorizontalBlock"] {
+        display: grid !important;
+        grid-template-columns: auto minmax(0, 1fr) auto auto;
+        gap: 0.2rem 0.5rem !important;
+        align-items: center !important;
+    }
+
+    div[class*="st-key-task_row_"]
+        > div[data-testid="stLayoutWrapper"]
+        > div[data-testid="stHorizontalBlock"]
+        > div[data-testid="stColumn"] {
+        width: auto !important;
+        min-width: 0 !important;
+    }
+
+    div[class*="st-key-task_row_"]
+        > div[data-testid="stLayoutWrapper"]
+        > div[data-testid="stHorizontalBlock"]
+        > div[data-testid="stColumn"]:nth-child(1) {
+        grid-column: 1;
+        grid-row: 2;
+    }
+
+    div[class*="st-key-task_row_"]
+        > div[data-testid="stLayoutWrapper"]
+        > div[data-testid="stHorizontalBlock"]
+        > div[data-testid="stColumn"]:nth-child(2) {
+        grid-column: 2;
+        grid-row: 2;
+    }
+
+    div[class*="st-key-task_row_"]
+        > div[data-testid="stLayoutWrapper"]
+        > div[data-testid="stHorizontalBlock"]
+        > div[data-testid="stColumn"]:nth-child(3) {
+        grid-column: 1 / 4;
+        grid-row: 1;
+        font-weight: 600;
+    }
+
+    div[class*="st-key-task_row_"]
+        > div[data-testid="stLayoutWrapper"]
+        > div[data-testid="stHorizontalBlock"]
+        > div[data-testid="stColumn"]:nth-child(4) {
+        grid-column: 3;
+        grid-row: 2;
+    }
+
+    div[class*="st-key-task_row_"]
+        > div[data-testid="stLayoutWrapper"]
+        > div[data-testid="stHorizontalBlock"]
+        > div[data-testid="stColumn"]:nth-child(5) {
+        grid-column: 4;
+        grid-row: 1 / 3;
+    }
+
+    div[class*="st-key-task_row_"]
+        > div[data-testid="stLayoutWrapper"]
+        > div[data-testid="stHorizontalBlock"]
+        > div[data-testid="stColumn"]:nth-child(5)
+        div[data-testid="stHorizontalBlock"] {
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 0.15rem !important;
+    }
+
+    div[class*="st-key-task_row_"]
+        > div[data-testid="stLayoutWrapper"]
+        > div[data-testid="stHorizontalBlock"]
+        > div[data-testid="stColumn"]:nth-child(5)
+        div[data-testid="stColumn"] {
+        flex: 1 1 0 !important;
+        width: auto !important;
+        min-width: 1.75rem !important;
+    }
+}
