@@ -1941,7 +1941,7 @@ def _enhance_image_to_4k_clarity(image_path: str) -> None:
             rgb = img.convert("RGB")
             # Crop out bottom watermark strip if from free Pollinations (e.g. 768x1344, 768x1280, or 1080x1920)
             if h >= 1200 and w <= 1080:
-                rgb = rgb.crop((0, 0, w, h - 95))
+                rgb = rgb.crop((0, 0, w, h - 120))
                 w, h = rgb.size
             # Upscale portrait 9:16 images to crisp 1080x1920 Full HD / 4K-mastered canvas
             if h > w and (w, h) != (1080, 1920):
