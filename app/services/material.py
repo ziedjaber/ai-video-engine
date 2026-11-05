@@ -1364,7 +1364,7 @@ def _openai_image_endpoint() -> tuple[str, str]:
     return f"{base_url}/{OPENAI_IMAGE_ENDPOINT_PATH}", model
 
 
-def _openai_image_size(video_aspect: VideoAspect) -> str:
+def _openai_image_size(video_aspect: VideoAspect, model: str = "") -> str:
     """
     解析请求的图片 size。
 
@@ -1375,6 +1375,15 @@ def _openai_image_size(video_aspect: VideoAspect) -> str:
     configured = str(config.app.get("openai_image_size", "") or "").strip()
     if configured:
         return configured
+    base_url = str(config.app.get("openai_image_base_url", "") or "").strip().lower()
+    if "imagerouter" in base_url:
+        m = str(model or config.app.get("openai_image_model", "") or "").lower()
+        if ":free" in m:
+            if "nano-banana" in m:
+                return "512x512"
+            return "1024x1024"
+        if VideoAspect(video_aspect) == VideoAspect.portrait:
+            return "768x1376"
     return OPENAI_IMAGE_DEFAULT_SIZES.get(VideoAspect(video_aspect), "1024x1024")
 
 
@@ -1828,7 +1837,7 @@ def generate_images_openai(
     aspect = VideoAspect(video_aspect)
     clip_duration = max(int(minimum_duration), 1)
     endpoint, model = _openai_image_endpoint()
-    image_size = _openai_image_size(aspect)
+    image_size = _openai_image_size(aspect, model=model)
     payload = {
         "model": model,
         "prompt": _openai_image_prompt(search_term),
