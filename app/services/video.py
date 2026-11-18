@@ -2231,11 +2231,13 @@ def _apply_openmontage_post_polish(
     cmd = [ffmpeg_exe, "-y", "-i", output_file]
     if vf_grade:
         cmd.extend(["-vf", f"{vf_grade},unsharp=5:5:0.5:5:5:0.0"])
-        cmd.extend(["-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p"])
+        cmd.extend(["-c:v", "libx264", "-preset", "fast", "-crf", "21", "-pix_fmt", "yuv420p"])
     else:
         cmd.extend(["-c:v", "copy"])
     if loudnorm_enabled:
-        cmd.extend(["-af", "loudnorm=I=-14:TP=-1.0:LRA=7", "-c:a", "aac", "-b:a", "192k", "-ar", "44100"])
+        # Combines ffmpeg-skill studio VOICE_CHAIN (highpass + deesser + compressor) with OpenMontage -14 LUFS loudnorm
+        voice_chain = "highpass=f=80,deesser=i=0.4,acompressor=threshold=-18dB:ratio=3:attack=5:release=80:makeup=2"
+        cmd.extend(["-af", f"{voice_chain},loudnorm=I=-14:TP=-1.0:LRA=7", "-c:a", "aac", "-b:a", "192k", "-ar", "44100"])
     else:
         cmd.extend(["-c:a", "copy"])
     cmd.extend(["-movflags", "+faststart", "-threads", str(max(1, int(threads))), temp_out])
