@@ -1895,7 +1895,8 @@ def generate_video(
             cleaned_phrase = re.sub(r"[^\w\s'’-]", "", phrase).strip().lower()
             if cleaned_phrase:
                 phrase = cleaned_phrase
-        max_width = video_width * 0.9
+        # OpenMontage universal cross-platform safe zone (~900px on 1080px canvas)
+        max_width = video_width * 0.83
         bg_color = resolve_subtitle_background_color()
         rounded_bg_enabled = bool(
             getattr(params, "rounded_subtitle_background", False) and bg_color
@@ -2182,7 +2183,82 @@ def generate_video(
                 logger=None,
                 fps=fps,
             )
+        _apply_openmontage_post_polish(
+            output_file=output_file,
+            threads=params.n_threads or 2,
+        )
         return bgm_mix_succeeded
+
+
+OPENMONTAGE_COLOR_PROFILES: dict[str, str] = {
+    "bright_clean": (
+        "curves=all='0/0.05 0.25/0.30 0.5/0.55 0.75/0.80 1/1.0',"
+        "eq=contrast=1.0:saturation=1.15:brightness=0.02"
+    ),
+    "high_contrast": (
+        "curves=all='0/0 0.20/0.12 0.5/0.50 0.80/0.88 1/1',"
+        "eq=contrast=1.18:saturation=1.12"
+    ),
+    "cinematic_cool": (
+        "colorbalance=rs=-0.02:gs=-0.03:bs=0.08:rh=0.06:gh=-0.02:bh=-0.06,"
+        "curves=all='0/0.02 0.25/0.20 0.5/0.48 0.75/0.78 1/0.98',"
+        "eq=contrast=1.08:saturation=1.05"
+    ),
+    "cinematic_warm": (
+        "colorbalance=rs=0.08:gs=0.02:bs=-0.05:rh=0.06:gh=0.02:bh=-0.04,"
+        "curves=all='0/0.03 0.25/0.22 0.5/0.50 0.75/0.78 1/0.97',"
+        "eq=contrast=1.05:saturation=1.1"
+    ),
+    "neutral": "eq=contrast=1.02:saturation=1.02:brightness=0.01",
+}
+
+
+def _apply_openmontage_post_polish(
+    output_file: str,
+    threads: int = 2,
+) -> None:
+    """Apply OpenMontage-inspired color grading, subtle sharpening, and -14 LUFS loudness normalization."""
+    if not output_file or not os.path.isfile(output_file):
+        return
+    profile_name = str(config.app.get("openmontage_color_profile", "bright_clean") or "").strip().lower()
+    loudnorm_enabled = bool(config.app.get("openmontage_loudnorm", True))
+    vf_grade = OPENMONTAGE_COLOR_PROFILES.get(profile_name, "")
+    if not vf_grade and not loudnorm_enabled:
+        return
+
+    ffmpeg_exe = get_ffmpeg_binary()
+    temp_out = f"{output_file}.openmontage_polish.mp4"
+    cmd = [ffmpeg_exe, "-y", "-i", output_file]
+    if vf_grade:
+        cmd.extend(["-vf", f"{vf_grade},unsharp=5:5:0.5:5:5:0.0"])
+        cmd.extend(["-c:v", "libx264", "-preset", "fast", "-crf", "18", "-pix_fmt", "yuv420p"])
+    else:
+        cmd.extend(["-c:v", "copy"])
+    if loudnorm_enabled:
+        cmd.extend(["-af", "loudnorm=I=-14:TP=-1.0:LRA=7", "-c:a", "aac", "-b:a", "192k", "-ar", "44100"])
+    else:
+        cmd.extend(["-c:a", "copy"])
+    cmd.extend(["-movflags", "+faststart", "-threads", str(max(1, int(threads))), temp_out])
+
+    try:
+        logger.info(
+            f"applying OpenMontage viral post-polish: profile={profile_name or 'none'}, loudnorm={loudnorm_enabled}"
+        )
+        res = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+        if res.returncode == 0 and os.path.isfile(temp_out) and os.path.getsize(temp_out) > 10000:
+            os.replace(temp_out, output_file)
+            logger.success(f"OpenMontage post-polish applied successfully: {output_file}")
+        else:
+            logger.warning(f"OpenMontage post-polish skipped (rc={res.returncode}): {res.stderr[-300:]}")
+            if os.path.isfile(temp_out):
+                os.remove(temp_out)
+    except Exception as exc:
+        logger.warning(f"OpenMontage post-polish failed safely, keeping original: {exc}")
+        if os.path.isfile(temp_out):
+            try:
+                os.remove(temp_out)
+            except OSError:
+                pass
 
 
 def render_image_zoom_video(
