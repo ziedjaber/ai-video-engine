@@ -142,10 +142,18 @@ Provide TWO types of visual queries for every scene:
 1. `cgi_3d_prompts`: Exactly 8 to 10 chronological prompts adhering to the template above (photorealistic 3D cutaways, light-slate studio background, medical-grade lighting, Cinema4D/Octane, 9:16, no text, no watermark).
 2. `video_keywords`: 8 tangible physical object keywords for stock fallback (e.g. "microchip macro", "copper wire cross section", "fiber optic light").
 
+### ZACK D. FILMS REVERSE-ENGINEERED TITLE FORMULAS (MANDATORY FOR `selected_topic`)
+Use one of these proven @zackdfilms Shorts title formulas (5-8 words, Title Case, zero hype words, ending with ONE emoji like 🤔, 🤨, or 🤯):
+- "How [Everyday Object/Mechanism] Works 🤔"
+- "How Strong Are Different [Everyday Objects] 🤔"
+- "How To Make [Unexpected Object] From [Material] 🤨"
+- "When You Should [Everyday Habit] 🤔"
+- "What Happens If [Physical Scenario] 🤯"
+
 ### OUTPUT FORMAT (STRICT JSON ONLY)
 Return ONLY valid JSON with no markdown formatting:
 {
-  "selected_topic": "Viral clickable title (e.g., What Actually Happens Inside AI Chips?)",
+  "selected_topic": "How A Quantum Computer Works 🤔",
   "viral_hook_type": "Curiosity Gap / Cutaway Mechanism",
   "source_trend": "The raw trend line you picked from the input",
   "script": "The complete spoken narration text (85-100 words, fast-paced, Zack D. Films style).",
